@@ -11,7 +11,8 @@ class Skeleton:
         self.screen = pygame.display.set_mode((640, 480))
         self.screen.fill(Color('white'))
 
-        bones = Bone(self.screen, None, 10, 20, 300, 120)
+        root = Bone(self.screen, True, 10, 20, 300, 120, None)
+        bones = Bone(self.screen, False, None, None, 400, 220, root)
 
         pygame.display.flip()
         pygame.display.update()
