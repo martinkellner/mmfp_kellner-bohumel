@@ -11,7 +11,6 @@ class Skeleton:
         self.screen = pygame.display.set_mode((500, 500))
         self.screen.fill(Color('white'))
 
-
         root = Bone(self.screen, True, 10, 90, 250, 200, None)
         bone0 = Bone(self.screen, False, 100, 90, None, None, root)
         bone1 = Bone(self.screen, False, 50, 45, None, None, root)
