@@ -31,8 +31,8 @@ class Bone:
                     raise Exception('Missing coordinates x2, y2, bone is not a root')
                 self.x1 = parent.x2
                 self.y1 = parent.y2
-                self.x2 = x2
-                self.y2 = y2
+                self.x2 = x2 + self.x1
+                self.y2 = y2 + self.y1
 
         self.draw()
         self.__repr__()
