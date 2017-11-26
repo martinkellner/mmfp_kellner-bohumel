@@ -1,16 +1,18 @@
 import pygame
 
 from pygame import Color
+from setuptools.command.saveopts import saveopts
+
 from src.bone import Bone
+from src.gui import sdlthread
 
 class Skeleton:
 
-    def __init__(self):
+    def __init__(self, screen):
         pygame.init()
 
-        self.screen = pygame.display.set_mode((500, 500))
+        self.screen = screen
         self.screen.fill(Color('white'))
-
 
         root = Bone(self.screen, True, 10, 90, 250, 200, None)
         bone0 = Bone(self.screen, False, 100, 90, None, None, root)
