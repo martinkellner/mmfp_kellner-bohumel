@@ -29,6 +29,9 @@ class Bone:
         self.draw()
         self.__repr__()
 
+    def __str__(self):
+        return '[( ' + str(self.startX) + ', ' + str(self.startY) + '),( ' + str(self.endX) + ', ' + str(self.endY) + ')]'
+
     def __repr__(self):
         print(str(self.startX) + ' ' + str(self.startY) + '\n' + str(self.endX) + ' ' + str(self.endY))
 
@@ -46,5 +49,17 @@ class Bone:
         self._endPointCircle = None
 
     def isOnHover(self, x, y):
-        ##TODO: calculate if point given by x,y is near to line segment
-        pass
+        test0 = abs((self.endY - self.startY)*x - (self.endX - self.startX)*y + self.endX*self.startY - self.endY*self.startX)/math.sqrt((self.endY - self.startY)**2 + (self.endX - self.startX)**2)
+        minx = min(self.startX, self.endX)
+        miny = min(self.startY, self.endY)
+        test1 = (minx - 3 < x < (self.startX if minx == self.endX else self.endX) + 3) and (miny - 3 < y < (self.startY if miny == self.endY else self.endY) + 3)
+        print(test0, end=' ')
+        print(test1)
+        return test0 < 3 and test1
+
+    def fillEndPointCircle(self, x, y):
+        if ((x - self.startX)**2 + (y - self.startY)) <= 2.5**2:
+            self._startPointCircle = pygame.draw.circle(self._screen, self._color,(int(self.startX), int(self.startY)), 5, 0)
+        elif ((x - self.endX)**2 + (y - self.endY)) <= 2.5**2:
+            self._endPointCircle = pygame.draw.circle(self._screen, self._color, (int(self.endX), int(self.endY)), 5, 0)
+        pygame.display.update()
