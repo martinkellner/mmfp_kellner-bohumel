@@ -45,5 +45,3 @@ class MyFrame(wx.Frame):
 
     def OnCloseWindow(self, event):
         self.Destroy()
-
-

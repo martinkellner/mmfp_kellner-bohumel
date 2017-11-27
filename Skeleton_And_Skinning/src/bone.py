@@ -23,6 +23,8 @@ class Bone:
 
         self._screen = screen
         self._color = Color('red') if root else Color('black')
+        self._startPointCircle = None
+        self._endPointCircle = None
 
         self.draw()
         self.__repr__()
@@ -31,4 +33,18 @@ class Bone:
         print(str(self.startX) + ' ' + str(self.startY) + '\n' + str(self.endX) + ' ' + str(self.endY))
 
     def draw(self):
-        pygame.draw.line(self._screen, self._color, (self.startX, self.startY), (self.endX, self.endY))
+        pygame.draw.line(self._screen, self._color, (self.startX, self.startY), (self.endX, self.endY), 2)
+        if self._endPointCircle != None and self._startPointCircle != None:
+            self.drawEndPoints()
+
+    def drawEndPoints(self):
+        self._startPointCircle = pygame.draw.circle(self._screen, self._color,(int(self.startX), int(self.startY)), 5, 1)
+        self._endPointCircle = pygame.draw.circle(self._screen, self._color, (int(self.endX), int(self.endY)), 5, 1)
+
+    def removeEndPoints(self):
+        self._startPointCircle = None
+        self._endPointCircle = None
+
+    def isOnHover(self, x, y):
+        ##TODO: calculate if point given by x,y is near to line segment
+        pass

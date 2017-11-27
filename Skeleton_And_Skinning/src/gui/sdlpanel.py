@@ -5,6 +5,7 @@ import os
 from src.gui.sdlthread import SDLThread
 
 class SDLPanel(wx.Panel):
+
     def __init__(self, parent, ID, game_size):
         global pyGame
         wx.Panel.__init__(self, parent, ID, size=game_size)

@@ -8,3 +8,4 @@ if __name__ == '__main__':
     frame = MyFrame(None, -1, "Danger Island", (800, 600))
     frame.Show()
     app.MainLoop()
+

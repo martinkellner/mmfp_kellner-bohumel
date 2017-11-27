@@ -1,4 +1,5 @@
 import pygame
+import math
 
 from pygame import Color
 from setuptools.command.saveopts import saveopts
@@ -8,18 +9,39 @@ from src.gui import sdlthread
 
 class Skeleton:
 
-    def __init__(self, screen):
+    def __init__(self):
         pygame.init()
+        self._bones = []
 
-        self.screen = screen
-        self.screen.fill(Color('white'))
+    def addBone(self, bone):
+        self._bones.append(bone)
 
-        root = Bone(self.screen, True, 10, 90, 250, 200, None)
-        bone0 = Bone(self.screen, False, 100, 90, None, None, root)
-        bone1 = Bone(self.screen, False, 50, 45, None, None, root)
-        bone2 = Bone(self.screen, False, 50, 135, None, None, root)
-        bone4 = Bone(self.screen, False, 50, 45, None, None, bone0)
-        bone5 = Bone(self.screen, False, 50, 135, None, None, bone0)
+    def addRootBone(self, bone):
+        pass
 
-        pygame.display.flip()
-        pygame.display.update()
+    def checkBoneOnHover(self, sx, ex):
+        ##TODO: uncomment if 'isOnHover' will be done
+        #for bone in self._bones:
+        #    bone.isOnHover(sx, ex)
+        #    if  bone.isOnHover(sx, ex):
+        #        bone.drawEndPoints()
+        #        pygame.display.update()
+        #        return bone
+        #    else:
+        #        bone.removeEndPoints()
+        #    pygame.display.update()
+        #return None
+        pass
+
+    def redraw(self):
+        for bone in self._bones:
+            bone.draw()
+
+    def addAndDraw(self, screen, xpos, ypos):
+
+        cLength = math.sqrt((xpos[0] - ypos[0]) ** 2 + (xpos[1] - ypos[1]) ** 2)
+        xDelta = ypos[0] - xpos[0]
+        yDelta = ypos[1] - xpos[1]
+        radian = math.atan2(yDelta, xDelta)
+        angle = radian * (180 / math.pi)
+        self._bones.append(Bone(screen, True, cLength, angle, xpos[0], xpos[1], None))
