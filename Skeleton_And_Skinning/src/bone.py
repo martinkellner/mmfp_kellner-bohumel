@@ -23,7 +23,6 @@ class Bone:
 
         self._screen = screen
         self._color = Color('red') if root else Color('black')
-        self._startPointCircle = None
         self._endPointCircle = None
 
         self.draw()
@@ -37,15 +36,13 @@ class Bone:
 
     def draw(self):
         pygame.draw.line(self._screen, self._color, (self.startX, self.startY), (self.endX, self.endY), 2)
-        if self._endPointCircle != None and self._startPointCircle != None:
+        if self._endPointCircle != None:
             self.drawEndPoints()
 
     def drawEndPoints(self):
-        self._startPointCircle = pygame.draw.circle(self._screen, self._color,(int(self.startX), int(self.startY)), 5, 1)
-        self._endPointCircle = pygame.draw.circle(self._screen, self._color, (int(self.endX), int(self.endY)), 5, 1)
+        self._endPointCircle = pygame.draw.circle(self._screen, self._color, (int(self.endX), int(self.endY)), 6, 1)
 
     def removeEndPoints(self):
-        self._startPointCircle = None
         self._endPointCircle = None
 
     def isOnHover(self, x, y):
@@ -58,8 +55,6 @@ class Bone:
         return test0 < 3 and test1
 
     def fillEndPointCircle(self, x, y):
-        if ((x - self.startX)**2 + (y - self.startY)) <= 2.5**2:
-            self._startPointCircle = pygame.draw.circle(self._screen, self._color,(int(self.startX), int(self.startY)), 5, 0)
-        elif ((x - self.endX)**2 + (y - self.endY)) <= 2.5**2:
-            self._endPointCircle = pygame.draw.circle(self._screen, self._color, (int(self.endX), int(self.endY)), 5, 0)
+        if ((x - self.endX)**2 + (y - self.endY)**2) <= 3.5**2:
+            self._endPointCircle = pygame.draw.circle(self._screen, self._color, (int(self.endX), int(self.endY)), 6, 0)
         pygame.display.update()

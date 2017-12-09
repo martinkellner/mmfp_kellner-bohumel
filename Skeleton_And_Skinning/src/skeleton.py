@@ -35,7 +35,7 @@ class Skeleton:
         for bone in self._bones:
             bone.draw()
 
-    def addAndDraw(self, screen, xpos, ypos, bone = None):
+    def addAndDraw(self, screen, xpos, ypos,  bone = None):
         cLength = math.sqrt((xpos[0] - ypos[0]) ** 2 + (xpos[1] - ypos[1]) ** 2)
         xDelta = ypos[0] - xpos[0]
         yDelta = ypos[1] - xpos[1]
@@ -45,3 +45,17 @@ class Skeleton:
             self._bones.append(Bone(screen, True, cLength, angle, xpos[0], xpos[1], None))
         else:
             self._bones.append(Bone(screen, False, cLength, angle, ypos[0], ypos[1], bone))
+
+    def drawOnly(self, screen, xpos, ypos, bone = None):
+        cLength = math.sqrt((xpos[0] - ypos[0]) ** 2 + (xpos[1] - ypos[1]) ** 2)
+        xDelta = ypos[0] - xpos[0]
+        yDelta = ypos[1] - xpos[1]
+        radian = math.atan2(yDelta, xDelta)
+        angle = radian * (180 / math.pi)
+        b = None
+        if bone == None:
+            b = Bone(screen, True, cLength, angle, xpos[0], xpos[1], None)
+        else:
+            b = Bone(screen, False, cLength, angle, ypos[0], ypos[1], bone)
+        b.draw()
+        pygame.display.update();
