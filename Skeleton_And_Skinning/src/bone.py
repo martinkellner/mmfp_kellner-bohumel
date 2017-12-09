@@ -23,6 +23,11 @@ class Bone:
 
         self._screen = screen
         self._color = Color('red') if root else Color('black')
+<<<<<<< HEAD
+=======
+        
+        self._startPointCircle = None
+>>>>>>> ddf622ac4c7b58178a0ee6cb2c0bd7f5e8ee2b9f
         self._endPointCircle = None
 
         self.draw()
@@ -58,3 +63,4 @@ class Bone:
         if ((x - self.endX)**2 + (y - self.endY)**2) <= 3.5**2:
             self._endPointCircle = pygame.draw.circle(self._screen, self._color, (int(self.endX), int(self.endY)), 6, 0)
         pygame.display.update()
+    
