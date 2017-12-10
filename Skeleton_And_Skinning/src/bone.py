@@ -23,15 +23,8 @@ class Bone:
 
         self._screen = screen
         self._color = Color('red') if root else Color('black')
-<<<<<<< HEAD
-=======
-        
-        self._startPointCircle = None
->>>>>>> ddf622ac4c7b58178a0ee6cb2c0bd7f5e8ee2b9f
-        self._endPointCircle = None
 
-        self.draw()
-        self.__repr__()
+        self._endPointCircle = None
 
     def __str__(self):
         return '[( ' + str(self.startX) + ', ' + str(self.startY) + '),( ' + str(self.endX) + ', ' + str(self.endY) + ')]'
@@ -51,13 +44,15 @@ class Bone:
         self._endPointCircle = None
 
     def isOnHover(self, x, y):
-        test0 = abs((self.endY - self.startY)*x - (self.endX - self.startX)*y + self.endX*self.startY - self.endY*self.startX)/math.sqrt((self.endY - self.startY)**2 + (self.endX - self.startX)**2)
-        minx = min(self.startX, self.endX)
-        miny = min(self.startY, self.endY)
-        test1 = (minx - 3 < x < (self.startX if minx == self.endX else self.endX) + 3) and (miny - 3 < y < (self.startY if miny == self.endY else self.endY) + 3)
-        print(test0, end=' ')
-        print(test1)
-        return test0 < 3 and test1
+        test0 = ((x - self.endX)**2 + (y - self.endY)**2) <= 3.5**2
+        if test0:
+            return True
+        else:
+            test1 = abs((self.endY - self.startY)*x - (self.endX - self.startX)*y + self.endX*self.startY - self.endY*self.startX)/math.sqrt((self.endY - self.startY)**2 + (self.endX - self.startX)**2)
+            minx = min(self.startX, self.endX)
+            miny = min(self.startY, self.endY)
+            test2 = (minx - 3 < x < (self.startX if minx == self.endX else self.endX) + 3) and (miny - 3 < y < (self.startY if miny == self.endY else self.endY) + 3)
+            return test1 < 3 and test2
 
     def fillEndPointCircle(self, x, y):
         if ((x - self.endX)**2 + (y - self.endY)**2) <= 3.5**2:

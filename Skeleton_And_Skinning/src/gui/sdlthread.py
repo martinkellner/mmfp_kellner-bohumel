@@ -9,6 +9,7 @@ bone = None
 extendLine = False
 
 class SDLThread(object):
+
     def __init__(self, parent, screen):
         self._parent = parent
         self.m_bKeepGoing = self.m_bRunning = False
@@ -46,30 +47,36 @@ class SDLThread(object):
         global bone
         global extendLine
         global boneHover
+
         if e.type == pyGame.MOUSEBUTTONDOWN:
-            print (self._parent.editing)
-            if self._parent.editing == True:
-                if not extendLine and bone != None:
-                    bone.fillEndPointCircle(e.pos[0], e.pos[1])
-                    extendLine = True
-                elif extendLine and bone != None:
-                    self.skeleton.addAndDraw(self.screen, [bone.endX, bone.endY], [e.pos[0], e.pos[1]], bone)
-                    extendLine = False
-                    bone = None
-                else:
-                    global xpos
-                    global ypos
-                    if xpos == None:
-                        xpos = (e.pos[0], e.pos[1])
-                    elif ypos == None:
-                        ypos = (e.pos[0], e.pos[1])
-                    if ypos != None and xpos != None:
-                        self.skeleton.addAndDraw(self.screen,xpos, ypos)
-                        xpos = ypos = None
+            if e.button == 3:
+                bone = xpos = ypos = None
+                extendLine = False
+                self.redraw()
+                pyGame.display.update()
+            else:
+                if self._parent.GetDrawing():
+                    if not extendLine and bone != None:
+                        bone.fillEndPointCircle(e.pos[0], e.pos[1])
+                        extendLine = True
+                    elif extendLine and bone != None:
+                        self.skeleton.addAndDraw(self.screen, [bone.endX, bone.endY], [e.pos[0], e.pos[1]], bone)
+                        extendLine = False
+                        bone = None
+                    else:
+                        global xpos
+                        global ypos
+                        if xpos == None:
+                            xpos = (e.pos[0], e.pos[1])
+                        elif ypos == None:
+                            ypos = (e.pos[0], e.pos[1])
+                        if ypos != None and xpos != None:
+                            self.skeleton.addAndDraw(self.screen,xpos, ypos)
+                            xpos = ypos = None
 
         if e.type == pyGame.MOUSEMOTION:
             self.redraw()
-            if self._parent.editing == True:
+            if self._parent.GetDrawing():
                 if not extendLine:
                     bone = self.skeleton.checkBoneOnHover(e.pos[0], e.pos[1])
                 if xpos != None:
