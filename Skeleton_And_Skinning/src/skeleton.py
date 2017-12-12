@@ -1,61 +1,51 @@
 import pygame
 import math
 
-from pygame import Color
-from setuptools.command.saveopts import saveopts
-
 from src.bone import Bone
-from src.gui import sdlthread
 
 class Skeleton:
 
     def __init__(self):
         pygame.init()
         self._bones = []
+        self._root = None
+        self.OnlyDrawBone = None
 
-    def addBone(self, bone):
-        self._bones.append(bone)
-
-    def addRootBone(self, bone):
-        pass
-
-    def checkBoneOnHover(self, sx, ex):
+    def OnHover(self, X, Y):
         for bone in self._bones:
-            bone.isOnHover(sx, ex)
-            if  bone.isOnHover(sx, ex):
-                bone.drawEndPoints()
-                pygame.display.update()
+            if  bone.IsOnHover(X, Y):
+                bone.DrawEndPoints()
                 return bone
             else:
-                bone.removeEndPoints()
-            pygame.display.update()
+                bone.RemoveEndPoints()
         return None
 
-    def redraw(self):
+    def Redraw(self):
+        if self.OnlyDrawBone:
+            self.OnlyDrawBone.Draw()
         for bone in self._bones:
-            bone.draw()
+            bone.Draw()
 
-    def addAndDraw(self, screen, xpos, ypos,  bone = None):
-        cLength = math.sqrt((xpos[0] - ypos[0]) ** 2 + (xpos[1] - ypos[1]) ** 2)
-        xDelta = ypos[0] - xpos[0]
-        yDelta = ypos[1] - xpos[1]
+    def AddBone(self, screen, sVector, eVector,  bone = None):
+        cLength = math.sqrt((sVector[0] - eVector[0]) ** 2 + (sVector[1] - eVector[1]) ** 2)
+        xDelta = eVector[0] - sVector[0]
+        yDelta = eVector[1] - sVector[1]
         radian = math.atan2(yDelta, xDelta)
-        angle = radian * (180 / math.pi)
         if bone == None:
-            self._bones.append(Bone(screen, True, cLength, angle, xpos[0], xpos[1], None))
+            if self._root == None:
+                self._bones.append(Bone(screen, cLength, radian, sVector, None))
+                self._root = self._bones[-1]
         else:
-            self._bones.append(Bone(screen, False, cLength, angle, ypos[0], ypos[1], bone))
+            self._bones.append(Bone(screen, cLength, radian, None, bone))
 
-    def drawOnly(self, screen, xpos, ypos, bone = None):
-        cLength = math.sqrt((xpos[0] - ypos[0]) ** 2 + (xpos[1] - ypos[1]) ** 2)
-        xDelta = ypos[0] - xpos[0]
-        yDelta = ypos[1] - xpos[1]
+
+    def DrawOnly(self, screen, sVector, eVector, bone = None):
+        cLength = math.sqrt((sVector[0] - eVector[0]) ** 2 + (sVector[1] - eVector[1]) ** 2)
+        xDelta = eVector[0] - sVector[0]
+        yDelta = eVector[1] - sVector[1]
         radian = math.atan2(yDelta, xDelta)
-        angle = radian * (180 / math.pi)
-        b = None
         if bone == None:
-            b = Bone(screen, True, cLength, angle, xpos[0], xpos[1], None)
+            b = Bone(screen, cLength, radian, sVector)
         else:
-            b = Bone(screen, False, cLength, angle, ypos[0], ypos[1], bone)
-        b.draw()
-        pygame.display.update();
+            b = Bone(screen, cLength, radian, parent=bone)
+        self.OnlyDrawBone = b
