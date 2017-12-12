@@ -6,7 +6,8 @@ from src.gui.sdlpanel import SDLPanel
 class MyFrame(wx.Frame):
 
     def __init__(self, parent, ID, title, game_size):
-        self._drawing = False
+        self._drawing = True
+        self._moving = False
 
         width, height = game_size
         wx.Frame.__init__(self, parent, ID, title, size=(width + 39, height + 34))
@@ -14,9 +15,13 @@ class MyFrame(wx.Frame):
         self.pnlSDL = SDLPanel(self, -1, game_size)
         toolbar = self.CreateToolBar(style=wx.TB_VERTICAL | wx.TB_TEXT | wx.NO_BORDER | wx.TB_FLAT)
 
-        id_drawing_tool = 2001
-        toolbar.AddCheckTool(id_drawing_tool, '' ,wx.Bitmap(ph.join(sys.path[1], 'resource\images\edit.png')), shortHelp="Edit")
-        wx.EvtHandler.Bind(toolbar,event=wx.EVT_TOOL, handler=self.OnDrawingTool, id=id_drawing_tool)
+        self.id_drawing_tool = 2001
+        toolbar.AddRadioTool(self.id_drawing_tool, '' ,wx.Bitmap(ph.join(sys.path[1], 'resource\images\edit.png')), shortHelp="Edit")
+        wx.EvtHandler.Bind(toolbar,event=wx.EVT_TOOL, handler=self.OnDrawingTool, id=self.id_drawing_tool)
+
+        self.id_moving_tool = 2002
+        toolbar.AddRadioTool(self.id_moving_tool, '', wx.Bitmap(ph.join(sys.path[1], 'resource\images\move.png')), shortHelp="Move")
+        wx.EvtHandler.Bind(toolbar, event=wx.EVT_TOOL, handler=self.OnMovingTool, id=self.id_moving_tool)
 
         toolbar.Realize()
 
@@ -45,7 +50,13 @@ class MyFrame(wx.Frame):
 
     def OnDrawingTool(self, e):
         """Tool Draw pressed"""
+        self._moving = not self._moving
         self._drawing = not self._drawing
+
+    def OnMovingTool(self, e):
+        """Tool Move pressed"""
+        self._drawing = not self._drawing
+        self._moving = not self._moving
 
     def OnKeyDown(self, e):
         """Any key pressed"""
@@ -53,4 +64,7 @@ class MyFrame(wx.Frame):
 
     def GetDrawing(self) -> bool:
         return self._drawing
+
+    def GetMoving(self) -> bool:
+        return self._moving
 
