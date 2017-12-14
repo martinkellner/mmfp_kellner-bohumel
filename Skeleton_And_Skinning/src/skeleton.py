@@ -38,7 +38,6 @@ class Skeleton:
         else:
             self._bones.append(Bone(screen, cLength, radian, None, bone))
 
-
     def DrawOnly(self, screen, sVector, eVector, bone = None):
         cLength = math.sqrt((sVector[0] - eVector[0]) ** 2 + (sVector[1] - eVector[1]) ** 2)
         xDelta = eVector[0] - sVector[0]
@@ -49,3 +48,7 @@ class Skeleton:
         else:
             b = Bone(screen, cLength, radian, parent=bone)
         self.OnlyDrawBone = b
+
+    def DrawMesh(self):
+        for _bone in self._bones:
+            _bone.Generate_Vertex()

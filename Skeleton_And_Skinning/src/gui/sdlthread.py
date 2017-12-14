@@ -81,6 +81,9 @@ class SDLThread(object):
                             self.skeleton.AddBone(self.screen,sVector, eVector)
                             sVector = eVector = None
 
+                elif self._parent.GetSkinning():
+                    self.skeleton.DrawMesh()
+
         if e.type == pyGame.MOUSEMOTION:
             if self._parent.GetDrawing():
                 if not extendLine:
@@ -93,6 +96,7 @@ class SDLThread(object):
             elif self._parent.GetMoving():
                 if dragBone != None:
                     dragBone.Move([e.pos[0], e.pos[1]])
+                    self.skeleton.DrawMesh()
                 else:
                     bone = self.skeleton.OnHover(e.pos[0], e.pos[1])
 

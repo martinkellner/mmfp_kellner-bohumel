@@ -1,8 +1,9 @@
 import pygame
-import numpy as np
 import math
 
 from pygame import Color
+
+from src.b_vertex import B_Vertex
 
 class Bone:
 
@@ -30,6 +31,8 @@ class Bone:
         if self._parent != None:
             self._parent.AddChild(self)
 
+        self._mesh = []
+
     def __str__(self):
         return '[( ' + str(self._sVector[0]) + ', ' + str(self._sVector[1]) + '),( ' + str(self._eVector[0]) + ', ' + str(self._eVector[1]) + ')]'
 
@@ -37,6 +40,8 @@ class Bone:
         print(str(self._sVector[0]) + ' ' + str(self._sVector[1]) + '\n' + str(self._eVector[0]) + ' ' + str(self._eVector[1]))
 
     def Draw(self):
+        if len(self._mesh):
+            self.DrawMesh()
         pygame.draw.line(self._screen, self._color, (self._sVector[0], self._sVector[1]),
                          (self._eVector[0], self._eVector[1]), 2 if self._endPointCircle == None else 3)
         if self._endPointCircle != None:
@@ -87,3 +92,20 @@ class Bone:
             _ch._angle = self._angle + _ch._sAngle
             _ch.CalculateEVector()
             _ch.MoveChilder()
+
+    def AddB_Vertex(self, p_Vertex, weight):
+        b_Vertex = B_Vertex(p_Vertex, self, weight)
+        self._mesh.append(b_Vertex)
+
+    def Generate_Vertex(self):
+        self._mesh = []
+        b1_vertex = B_Vertex([self._sVector[0], self._sVector[1] + 10], self, 0.0)
+        b2_vertex = B_Vertex([self._sVector[0], self._sVector[1] - 10], self, 0.0)
+        b3_vertex = B_Vertex([self._eVector[0], self._eVector[1] - 10], self, 0.0)
+        b4_vertex = B_Vertex([self._eVector[0], self._eVector[1] + 10], self, 0.0)
+        self._mesh.append(b1_vertex); self._mesh.append(b2_vertex); self._mesh.append(b3_vertex); self._mesh.append(b4_vertex);
+
+
+    def DrawMesh(self):
+        for i in range(len(self._mesh)):
+            pygame.draw.line(self._screen, self._color, self._mesh[i%4]._pVector, self._mesh[(i+1)%4]._pVector, 1)
