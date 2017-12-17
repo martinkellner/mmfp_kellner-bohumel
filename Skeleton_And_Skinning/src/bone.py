@@ -1,18 +1,18 @@
 import pygame
 import math
 
+import numpy as np
 from pygame import Color
-
-from src.b_vertex import B_Vertex
 
 class Bone:
 
     def __init__(self, screen, length, angle, sVector=None, parent=None):
 
         self._sVector = parent._eVector if parent != None else sVector
-        self._eVector = [None, None]
+        self._eVector = [None, None, 1]
         self._angle = angle
         self._sAngle = self._angle - parent._angle if parent != None else self._angle
+        self._dAngle = 0.0
         self._lenght = length
         self._parent = parent
         self._children = []
@@ -79,7 +79,10 @@ class Bone:
     def Move(self, eM_Vector):
         xDelta = eM_Vector[0] - self._sVector[0]
         yDelta = eM_Vector[1] - self._sVector[1]
-        self._angle = math.atan2(yDelta, xDelta)
+
+        _angle = math.atan2(yDelta, xDelta)
+        self._dAngle = self._sAngle = _angle - self._angle
+        self._angle = _angle
         if self._parent != None:
             self._sAngle = self._angle - self._parent._angle
         savParent = self._parent; self._parent = None
@@ -93,19 +96,35 @@ class Bone:
             _ch.CalculateEVector()
             _ch.MoveChilder()
 
-    def AddB_Vertex(self, p_Vertex, weight):
-        b_Vertex = B_Vertex(p_Vertex, self, weight)
-        self._mesh.append(b_Vertex)
+    def getWMatrix(self):
+        p_wMatrix = None
+        if self._parent != None:
+            p_wMatrix = self._parent.getWMatrix()
 
-    def Generate_Vertex(self):
-        self._mesh = []
-        b1_vertex = B_Vertex([self._sVector[0], self._sVector[1] + 10], self, 0.0)
-        b2_vertex = B_Vertex([self._sVector[0], self._sVector[1] - 10], self, 0.0)
-        b3_vertex = B_Vertex([self._eVector[0], self._eVector[1] - 10], self, 0.0)
-        b4_vertex = B_Vertex([self._eVector[0], self._eVector[1] + 10], self, 0.0)
-        self._mesh.append(b1_vertex); self._mesh.append(b2_vertex); self._mesh.append(b3_vertex); self._mesh.append(b4_vertex);
+        #matrix to translate to bone's coords
+        tb_matrix = np.array([
+            [1, 0, self._sVector[0]],
+            [0, 1, self._sVector[1]],
+            [0, 0, 1]
+        ])
 
+        #rotation matrix of bone
+        lr_matrix = np.array([
+            [math.cos(self._dAngle), -1*math.sin(self._dAngle), 0],
+            [math.sin(self._dAngle), math.cos(self._dAngle), 0],
+            [0, 0, 1]
+        ])
 
-    def DrawMesh(self):
-        for i in range(len(self._mesh)):
-            pygame.draw.line(self._screen, self._color, self._mesh[i%4]._pVector, self._mesh[(i+1)%4]._pVector, 1)
+        #translate back to world coord
+        tw_matrix = np.array([
+            [1, 0, -self._sVector[0]],
+            [0, 1, -self._sVector[1]],
+            [0, 0, 1]
+        ])
+
+        wMatrix = np.dot(tb_matrix, lr_matrix)
+        wMatrix = np.dot(wMatrix, tw_matrix)
+
+        if self._parent != None:
+            return np.dot(p_wMatrix, wMatrix)
+        return wMatrix

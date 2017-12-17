@@ -1,6 +1,7 @@
 import pygame
 import math
 
+from src.m_vertex import M_Vertex
 from src.bone import Bone
 
 class Skeleton:
@@ -10,6 +11,7 @@ class Skeleton:
         self._bones = []
         self._root = None
         self.OnlyDrawBone = None
+        self._skin = []
 
     def OnHover(self, X, Y):
         for bone in self._bones:
@@ -49,6 +51,19 @@ class Skeleton:
             b = Bone(screen, cLength, radian, parent=bone)
         self.OnlyDrawBone = b
 
-    def DrawMesh(self):
-        for _bone in self._bones:
-            _bone.Generate_Vertex()
+    def DrawMesh(self, screen):
+        if len(self._skin) > 2:
+            pygame.draw.polygon(screen, pygame.Color('blue'), list(map(lambda x: x._pVector[:-1], self._skin)), 0)
+        for _v_Skin in self._skin:
+            _v_Skin.Draw(screen)
+
+    def AddM_Vertex(self, pVertex):
+        n_M_Vertex = M_Vertex(pVertex)
+        n_M_Vertex.calInfBoneAndWeights(self._bones)
+        self._skin.append(n_M_Vertex)
+
+
+
+    def TranformSkin(self):
+        for _m_Vertex in self._skin:
+            _m_Vertex.Tranformation()
