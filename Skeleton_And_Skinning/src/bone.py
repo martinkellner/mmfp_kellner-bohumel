@@ -1,5 +1,6 @@
 import pygame
-import math
+from math import cos, sin, atan2, sqrt
+
 
 import numpy as np
 from pygame import Color
@@ -31,7 +32,8 @@ class Bone:
         if self._parent != None:
             self._parent.AddChild(self)
 
-        self._mesh = []
+        self._wMatrix = None
+        self.ReceiveWMatrix()
 
     def __str__(self):
         return '[( ' + str(self._sVector[0]) + ', ' + str(self._sVector[1]) + '),( ' + str(self._eVector[0]) + ', ' + str(self._eVector[1]) + ')]'
@@ -40,8 +42,6 @@ class Bone:
         print(str(self._sVector[0]) + ' ' + str(self._sVector[1]) + '\n' + str(self._eVector[0]) + ' ' + str(self._eVector[1]))
 
     def Draw(self):
-        if len(self._mesh):
-            self.DrawMesh()
         pygame.draw.line(self._screen, self._color, (self._sVector[0], self._sVector[1]),
                          (self._eVector[0], self._eVector[1]), 2 if self._endPointCircle == None else 3)
         if self._endPointCircle != None:
@@ -58,7 +58,7 @@ class Bone:
         if test0:
             return True
         else:
-            test1 = abs((self._eVector[1] - self._sVector[1])*x - (self._eVector[0] - self._sVector[0])*y + self._eVector[0]*self._sVector[1] - self._eVector[1]*self._sVector[0])/math.sqrt((self._eVector[1] - self._sVector[1])**2 + (self._eVector[0] - self._sVector[0])**2)
+            test1 = abs((self._eVector[1] - self._sVector[1])*x - (self._eVector[0] - self._sVector[0])*y + self._eVector[0]*self._sVector[1] - self._eVector[1]*self._sVector[0])/sqrt((self._eVector[1] - self._sVector[1])**2 + (self._eVector[0] - self._sVector[0])**2)
             if not (test1 < 3):
                 return False
             minX = min(self._sVector[0], self._eVector[0])
@@ -73,15 +73,16 @@ class Bone:
         self._countChildren += 1
 
     def CalculateEVector(self):
-        self._eVector[0] = self._sVector[0] + (self._lenght * math.cos(self._angle if self._parent == None else self._sAngle + self._parent._angle))
-        self._eVector[1] = self._sVector[1] + (self._lenght * math.sin(self._angle if self._parent == None else self._sAngle + self._parent._angle))
+        self._eVector[0] = self._sVector[0] + (self._lenght * cos(self._angle if self._parent == None else self._sAngle + self._parent._angle))
+        self._eVector[1] = self._sVector[1] + (self._lenght * sin(self._angle if self._parent == None else self._sAngle + self._parent._angle))
 
     def Move(self, eM_Vector):
         xDelta = eM_Vector[0] - self._sVector[0]
         yDelta = eM_Vector[1] - self._sVector[1]
 
-        _angle = math.atan2(yDelta, xDelta)
+        _angle = atan2(yDelta, xDelta)
         self._dAngle = self._sAngle = _angle - self._angle
+        self.ReCalwMatrix()
         self._angle = _angle
         if self._parent != None:
             self._sAngle = self._angle - self._parent._angle
@@ -94,37 +95,22 @@ class Bone:
         for _ch in self._children:
             _ch._angle = self._angle + _ch._sAngle
             _ch.CalculateEVector()
+            _ch.ReCalwMatrix()
             _ch.MoveChilder()
+            _ch._dAngle = 0.0
+            _ch.ReCalwMatrix()
 
-    def getWMatrix(self):
-        p_wMatrix = None
-        if self._parent != None:
-            p_wMatrix = self._parent.getWMatrix()
-
+    def ReceiveWMatrix(self):
         #matrix to translate to bone's coords
-        tb_matrix = np.array([
-            [1, 0, self._sVector[0]],
-            [0, 1, self._sVector[1]],
-            [0, 0, 1]
+        sinA = sin(self._dAngle)
+        cosA = cos(self._dAngle)
+        self._wMatrix = np.array([
+            [cosA, -1*sinA, -1*cosA*self._sVector[0] + sinA*self._sVector[1] + self._sVector[0]],
+            [sinA,    cosA, -1*sinA*self._sVector[0] - cosA*self._sVector[1] + self._sVector[1]],
+            [   0,       0,                                                                  1]
         ])
 
-        #rotation matrix of bone
-        lr_matrix = np.array([
-            [math.cos(self._dAngle), -1*math.sin(self._dAngle), 0],
-            [math.sin(self._dAngle), math.cos(self._dAngle), 0],
-            [0, 0, 1]
-        ])
-
-        #translate back to world coord
-        tw_matrix = np.array([
-            [1, 0, -self._sVector[0]],
-            [0, 1, -self._sVector[1]],
-            [0, 0, 1]
-        ])
-
-        wMatrix = np.dot(tb_matrix, lr_matrix)
-        wMatrix = np.dot(wMatrix, tw_matrix)
-
+    def ReCalwMatrix(self):
+        self.ReceiveWMatrix()
         if self._parent != None:
-            return np.dot(p_wMatrix, wMatrix)
-        return wMatrix
+            self._wMatrix = np.dot(self._parent._wMatrix, self._wMatrix)

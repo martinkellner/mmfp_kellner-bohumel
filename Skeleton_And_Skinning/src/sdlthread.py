@@ -1,7 +1,7 @@
 import _thread as thread
 import pygame as pyGame
 from pygame import Color
-from src.skeleton import Skeleton
+from skeleton import Skeleton
 
 sVector = None
 eVector = None
@@ -60,6 +60,7 @@ class SDLThread(object):
                 if self._parent.GetMoving():
                     if dragBone != None:
                         dragBone = None
+                        self.skeleton.RstWBnsWMatrix()
                     elif bone != None:
                         dragBone = bone
                         self.skeleton.OnlyDrawBone = None
@@ -82,7 +83,7 @@ class SDLThread(object):
                             sVector = eVector = None
 
                 elif self._parent.GetSkinning():
-                    self.skeleton.AddM_Vertex([e.pos[0], e.pos[1], 1])
+                    self.skeleton.AddM_Vertex([e.pos[0], e.pos[1]])
 
         if e.type == pyGame.MOUSEMOTION:
             if self._parent.GetDrawing():
@@ -97,7 +98,10 @@ class SDLThread(object):
                 if dragBone != None:
                     dragBone.Move([e.pos[0], e.pos[1]])
                     self.skeleton.TranformSkin()
-                    dragBone._dAngle = 0.0
+                    dragBone._dAngle = 0
+                    dragBone.ReCalwMatrix()
+                    for _ch in dragBone._children:
+                        _ch.ReCalwMatrix()
                 else:
                     bone = self.skeleton.OnHover(e.pos[0], e.pos[1])
 

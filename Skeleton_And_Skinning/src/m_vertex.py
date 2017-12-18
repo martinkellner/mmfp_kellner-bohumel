@@ -1,10 +1,6 @@
 import pygame
 import math
 import numpy as np
-from numpy import arccos, array, dot, pi
-
-from numpy.linalg import det, norm
-
 
 class M_Vertex:
 
@@ -19,10 +15,11 @@ class M_Vertex:
 
     def Tranformation(self):
         np_PVector = np.array([0.0, 0.0, 0.0])
+        old_PVector = self._pVector + [1]
         for i in range(len(self._infBones)):
-            np_PVector += (np.dot(self._infBones[i].getWMatrix(), self._pVector) *  self._weights[i])
-        print(np_PVector)
-        self._pVector = np_PVector.tolist()
+            np_PVector += (np.dot(self._infBones[i]._wMatrix, old_PVector) *  self._weights[i])
+        self._pVector[0] = round(np_PVector[0], 4)
+        self._pVector[1] = round(np_PVector[1], 4)
 
     def calInfBoneAndWeights(self, bones):
         distBones = []
@@ -42,8 +39,17 @@ class M_Vertex:
         elif len(distBones) == 1:
             self._weights.append(1)
             return
-        for iDist in distBones:
-            self._weights.append(1 - (iDist/sDistances))
+        print(distBones)
+        print(sum(distBones))
+        sDist = sum(distBones)
+        for i in distBones:
+            self._weights.append((sDist-i)/sDist)
+        #self._weights = self._weights[::-1]
+        sWeigth = sum(self._weights)
+        self._weights = list(map(lambda x: x/sWeigth, self._weights))
+        print(self._weights)
+
+
 
     def lineMagnitude(self, x1, y1, x2, y2):
         lineMagnitude = math.sqrt(math.pow((x2 - x1), 2) + math.pow((y2 - y1), 2))

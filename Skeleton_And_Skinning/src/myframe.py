@@ -1,7 +1,10 @@
-import wx
 import os.path as ph
 import sys
-from src.gui.sdlpanel import SDLPanel
+
+import wx
+
+from sdlpanel import SDLPanel
+
 
 class MyFrame(wx.Frame):
 
@@ -17,16 +20,15 @@ class MyFrame(wx.Frame):
         toolbar = self.CreateToolBar(style=wx.TB_VERTICAL | wx.TB_TEXT | wx.NO_BORDER | wx.TB_FLAT)
 
         self.id_drawing_tool = 2001
-        toolbar.AddRadioTool(self.id_drawing_tool, '' ,wx.Bitmap(ph.join(sys.path[1], 'resource\images\edit.png')), shortHelp="Edit")
+        toolbar.AddRadioTool(self.id_drawing_tool, '' ,wx.Bitmap('edit.png'), shortHelp="Edit")
         wx.EvtHandler.Bind(toolbar,event=wx.EVT_TOOL, handler=self.OnDrawingTool, id=self.id_drawing_tool)
 
         self.id_moving_tool = 2002
-        toolbar.AddRadioTool(self.id_moving_tool, '', wx.Bitmap(ph.join(sys.path[1], 'resource\images\move.png')), shortHelp="Move")
+        toolbar.AddRadioTool(self.id_moving_tool, '', wx.Bitmap('move.png'), shortHelp="Move")
         wx.EvtHandler.Bind(toolbar, event=wx.EVT_TOOL, handler=self.OnMovingTool, id=self.id_moving_tool)
 
         self.id_skinning_tool = 2003
-        toolbar.AddRadioTool(self.id_skinning_tool, '', wx.Bitmap(ph.join(sys.path[1], 'resource\images\mesh.png')),
-                             shortHelp="Skinning")
+        toolbar.AddRadioTool(self.id_skinning_tool, '', wx.Bitmap('mesh.png'), shortHelp="Skinning")
         wx.EvtHandler.Bind(toolbar, event=wx.EVT_TOOL, handler=self.OnSkinningTool, id=self.id_skinning_tool)
 
         toolbar.Realize()
