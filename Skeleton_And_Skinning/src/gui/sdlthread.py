@@ -68,18 +68,21 @@ class SDLThread(object):
                         extendLine = True
                         bone._selected = True
                     elif extendLine and bone != None:
-                        self.skeleton.AddBone(self.screen, bone._eVector, [e.pos[0], e.pos[1]], bone)
+                        self.skeleton.AddBone(self.screen, bone._eVector, [e.pos[0], e.pos[1], 1], bone)
                         extendLine = False
                         bone._selected = False
                         bone = None
                     else:
                         if sVector == None:
-                            sVector = (e.pos[0], e.pos[1])
+                            sVector = (e.pos[0], e.pos[1], 1)
                         elif eVector == None:
-                            eVector = (e.pos[0], e.pos[1])
+                            eVector = (e.pos[0], e.pos[1], 1)
                         if eVector != None and sVector != None:
                             self.skeleton.AddBone(self.screen,sVector, eVector)
                             sVector = eVector = None
+
+                elif self._parent.GetSkinning():
+                    self.skeleton.AddM_Vertex([e.pos[0], e.pos[1], 1])
 
         if e.type == pyGame.MOUSEMOTION:
             if self._parent.GetDrawing():
@@ -93,10 +96,20 @@ class SDLThread(object):
             elif self._parent.GetMoving():
                 if dragBone != None:
                     dragBone.Move([e.pos[0], e.pos[1]])
+                    self.skeleton.TranformSkin()
+                    dragBone._dAngle = 0.0
                 else:
                     bone = self.skeleton.OnHover(e.pos[0], e.pos[1])
 
     def Redraw(self):
         self.screen.fill(Color('white'))
+        self.skeleton.DrawMesh(self.screen)
         self.skeleton.Redraw()
         pyGame.display.update()
+
+
+
+
+
+
+

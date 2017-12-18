@@ -8,6 +8,7 @@ class MyFrame(wx.Frame):
     def __init__(self, parent, ID, title, game_size):
         self._drawing = True
         self._moving = False
+        self._skinning = False
 
         width, height = game_size
         wx.Frame.__init__(self, parent, ID, title, size=(width + 39, height + 34))
@@ -22,6 +23,11 @@ class MyFrame(wx.Frame):
         self.id_moving_tool = 2002
         toolbar.AddRadioTool(self.id_moving_tool, '', wx.Bitmap(ph.join(sys.path[1], 'resource\images\move.png')), shortHelp="Move")
         wx.EvtHandler.Bind(toolbar, event=wx.EVT_TOOL, handler=self.OnMovingTool, id=self.id_moving_tool)
+
+        self.id_skinning_tool = 2003
+        toolbar.AddRadioTool(self.id_skinning_tool, '', wx.Bitmap(ph.join(sys.path[1], 'resource\images\mesh.png')),
+                             shortHelp="Skinning")
+        wx.EvtHandler.Bind(toolbar, event=wx.EVT_TOOL, handler=self.OnSkinningTool, id=self.id_skinning_tool)
 
         toolbar.Realize()
 
@@ -50,13 +56,18 @@ class MyFrame(wx.Frame):
 
     def OnDrawingTool(self, e):
         """Tool Draw pressed"""
-        self._moving = not self._moving
-        self._drawing = not self._drawing
+        self._skinning = self._moving = False
+        self._drawing = True
 
     def OnMovingTool(self, e):
         """Tool Move pressed"""
-        self._drawing = not self._drawing
-        self._moving = not self._moving
+        self._drawing = self._moving = False
+        self._moving = True
+
+    def OnSkinningTool(self, e):
+        """Tool Skinning pressed"""
+        self._drawing = self._moving = False
+        self._skinning = True
 
     def OnKeyDown(self, e):
         """Any key pressed"""
@@ -68,3 +79,5 @@ class MyFrame(wx.Frame):
     def GetMoving(self) -> bool:
         return self._moving
 
+    def GetSkinning(self) -> bool:
+        return self._skinning
