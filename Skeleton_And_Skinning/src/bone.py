@@ -98,10 +98,8 @@ class Bone:
             _ch.ReCalwMatrix()
             _ch.MoveChilder()
             _ch._dAngle = 0.0
-            _ch.ReCalwMatrix()
 
     def ReceiveWMatrix(self):
-        #matrix to translate to bone's coords
         sinA = sin(self._dAngle)
         cosA = cos(self._dAngle)
         self._wMatrix = np.array([

@@ -71,3 +71,28 @@ class Skeleton:
     def RstWBnsWMatrix(self):
         for _ch in self._bones:
             _ch.ReCalwMatrix()
+
+    def DeleteBone(self, bone):
+        boneToDel = self.GetBoneChildren(bone) + [bone]
+        for _bone in boneToDel:
+            for i in range(len(self._bones)):
+                if _bone == self._bones[i]:
+                    self._bones[i] = None
+                    break
+
+        self.Refresh()
+
+    def GetBoneChildren(self, bone) -> list:
+        if bone != None and len(bone._children) != 0:
+            children = [] + bone._children
+            for _child in bone._children:
+                children += self.GetBoneChildren(_child)
+            return children
+        return []
+
+    def Refresh(self):
+        cBones = []
+        for _bone in self._bones:
+            if _bone != None:
+                cBones.append(_bone)
+        self._bones = cBones

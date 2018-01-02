@@ -18,4 +18,3 @@ class SDLPanel(wx.Panel):
         window = pygame.display.set_mode(game_size)
         self.thread = SDLThread(parent, window)
         self.thread.Start()
-

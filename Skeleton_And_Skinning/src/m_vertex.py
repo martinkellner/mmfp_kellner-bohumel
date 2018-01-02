@@ -8,7 +8,7 @@ class M_Vertex:
         self._pVector = pVector
         self._weights = []
         self._infBones = []
-        self._maxDist = 25.0;
+        self._maxDist = 30.0;
 
     def Draw(self, screen):
         pygame.draw.circle(screen, pygame.Color('purple'),[int(self._pVector[0]), int(self._pVector[1])], 3, 0)
@@ -32,7 +32,6 @@ class M_Vertex:
             distBones.append(bDistance)
             self._infBones.append(_bone)
 
-        sDistances = sum(distBones)
         if len(distBones) == 0:
             self._infBones = []
             return
@@ -44,12 +43,9 @@ class M_Vertex:
         sDist = sum(distBones)
         for i in distBones:
             self._weights.append((sDist-i)/sDist)
-        #self._weights = self._weights[::-1]
         sWeigth = sum(self._weights)
         self._weights = list(map(lambda x: x/sWeigth, self._weights))
         print(self._weights)
-
-
 
     def lineMagnitude(self, x1, y1, x2, y2):
         lineMagnitude = math.sqrt(math.pow((x2 - x1), 2) + math.pow((y2 - y1), 2))
@@ -82,3 +78,7 @@ class M_Vertex:
             DistancePointLine = self.lineMagnitude(px, py, ix, iy)
 
         return DistancePointLine
+
+    def ReCalculate(self, bones):
+        self.calInfBoneAndWeights(bones)
+        self.Tranformation()
