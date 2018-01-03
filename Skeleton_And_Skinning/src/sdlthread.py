@@ -6,8 +6,11 @@ from skeleton import Skeleton
 sVector = None
 eVector = None
 bone = None
+boneSelected = None
 dragBone = None
 extendLine = False
+mVectorHovered = None
+mVectorSelected = None
 
 class SDLThread(object):
 
@@ -50,7 +53,10 @@ class SDLThread(object):
 
         if e.type == pyGame.MOUSEBUTTONDOWN:
             if e.button == 3:
-                self.DragingBoneRMouseDown()
+                if self._parent.GetDrawing():
+                    self.DrawingBoneRMouseDown()
+                elif self._parent.GetSkinning():
+                    self.SkinningRMouseDown(e)
             else:
                 if self._parent.GetMoving():
                     self.MovingLMouseDown()
@@ -58,16 +64,22 @@ class SDLThread(object):
                     self.DragingLMouseDown(e)
                 elif self._parent.GetSkinning():
                     self.SkinningLMouseDown(e)
-                elif self._parent.GetDelete():
-                    self.DeleteLMouseDown()
 
         if e.type == pyGame.MOUSEMOTION:
             if self._parent.GetDrawing():
-                self.DragingBoneMMouse(e)
+                self.DrawingBoneMMouse(e)
             elif self._parent.GetMoving():
                 self.MovingBoneMMouse(e)
-            elif self._parent.GetDelete():
-                self.DeleteBoneMMouse(e)
+            elif self._parent.GetSkinning():
+                self.SkinningMMouse(e)
+
+        if e.type == pyGame.KEYDOWN:
+            '''key delete pressed'''
+            if e.key == pyGame.K_DELETE:
+                if boneSelected != None:
+                    self.DeleteBone()
+                elif mVectorSelected != None:
+                    self.DeleteMVector()
 
     def Redraw(self):
         self.screen.fill(Color('white'))
@@ -75,10 +87,10 @@ class SDLThread(object):
         self.skeleton.Redraw()
         pyGame.display.update()
 
-    def DragingBoneMMouse(self, e):
-        global bone
-        if not extendLine:
-            bone = self.skeleton.OnHover(e.pos[0], e.pos[1])
+    def DrawingBoneMMouse(self, e):
+        global bone, boneSelected
+        if not extendLine and boneSelected == None:
+            bone = self.skeleton.OnHoverBone(e.pos[0], e.pos[1])
         if sVector != None:
             self.skeleton.DrawOnly(self.screen, [sVector[0], sVector[1]], [e.pos[0], e.pos[1]], None)
         else:
@@ -95,14 +107,23 @@ class SDLThread(object):
             for _ch in dragBone._children:
                 _ch.ReCalwMatrix()
         else:
-            bone = self.skeleton.OnHover(e.pos[0], e.pos[1])
+            bone = self.skeleton.OnHoverBone(e.pos[0], e.pos[1])
 
-    def DragingBoneRMouseDown(self):
-        global bone, extendLine, sVector, eVector
-        if self._parent.GetDrawing():
+    def DrawingBoneRMouseDown(self):
+        global bone, extendLine, sVector, eVector, boneSelected
+        if extendLine:
             bone = sVector = eVector = None
             extendLine = False
             self.skeleton.OnlyDrawBone = None
+        elif boneSelected != None:
+            boneSelected._selected = False
+            boneSelected = None
+        elif bone != None:
+            boneSelected = bone
+            boneSelected._selected = True
+
+
+
 
     def MovingLMouseDown(self):
         global dragBone
@@ -114,8 +135,11 @@ class SDLThread(object):
             self.skeleton.OnlyDrawBone = None
 
     def DragingLMouseDown(self, e):
-        global extendLine, bone, sVector, eVector
-        if not extendLine and bone != None:
+        global extendLine, bone, sVector, eVector, boneSelected
+        if boneSelected != None:
+            boneSelected._selected = False
+            boneSelected = None
+        elif not extendLine and bone != None:
             extendLine = True
             bone._selected = True
         elif extendLine and bone != None:
@@ -129,19 +153,44 @@ class SDLThread(object):
             elif eVector == None:
                 eVector = (e.pos[0], e.pos[1], 1)
             if eVector != None and sVector != None:
-                self.skeleton.AddBone(self.screen,sVector, eVector)
+                self.skeleton.AddBone(self.screen, sVector, eVector)
                 sVector = eVector = None
 
     def SkinningLMouseDown(self, e):
-        self.skeleton.AddM_Vertex([e.pos[0], e.pos[1]])
+        global mVectorSelected
+        if mVectorSelected != None:
+            mVectorSelected._selected = False
+            self.skeleton.CallReCalculateMVector(mVectorSelected)
+            self.skeleton.RefreshSkinning()
+            mVectorSelected = None
+        else:
+            self.skeleton.AddM_Vertex([e.pos[0], e.pos[1]])
 
-    def DeleteLMouseDown(self):
-        global bone
-        if bone != None:
-            self.skeleton.DeleteBone(bone)
+    def DeleteBone(self):
+        global boneSelected
+        self.skeleton.DeleteBone(boneSelected)
         self.skeleton.OnlyDrawBone = None
-        bone = None
+        boneSelected = None
 
-    def DeleteBoneMMouse(self, e):
-        global bone
-        bone = self.skeleton.OnHover(e.pos[0], e.pos[1])
+    def SkinningMMouse(self, e):
+        global mVectorHovered, mVectorSelected
+        if mVectorSelected == None:
+            mVectorHovered = self.skeleton.OnHoverMVector(e.pos[0], e.pos[1])
+        else:
+            mVectorSelected.Drag([e.pos[0], e.pos[1]])
+
+    def SkinningRMouseDown(self, e):
+        global mVectorHovered, mVectorSelected
+        if mVectorSelected != None:
+            mVectorSelected._selected = False
+            self.skeleton.CallReCalculateMVector(mVectorSelected)
+            self.skeleton.RefreshSkinning()
+            mVectorSelected = None
+        elif mVectorHovered != None:
+            mVectorSelected = mVectorHovered
+
+    def DeleteMVector(self):
+        global mVectorSelected
+        if mVectorSelected != None:
+            self.skeleton.DeleteMVector(mVectorSelected)
+            mVectorSelected = None

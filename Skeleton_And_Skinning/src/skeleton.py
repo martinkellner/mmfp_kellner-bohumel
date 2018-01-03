@@ -14,13 +14,21 @@ class Skeleton:
         self._skin = []
         self._skinPoints = []
 
-    def OnHover(self, X, Y):
+    def OnHoverBone(self, X, Y):
         for bone in self._bones:
             if  bone.IsOnHover(X, Y):
                 bone.DrawEndPoints()
                 return bone
             else:
                 bone.RemoveEndPoints()
+        return None
+
+    def OnHoverMVector(self, x, y):
+        for _m_vect in self._skin:
+            if _m_vect.OnHover(x, y):
+                _m_vect._selected = True
+                return _m_vect
+            _m_vect._selected = False
         return None
 
     def Redraw(self):
@@ -79,8 +87,16 @@ class Skeleton:
                 if _bone == self._bones[i]:
                     self._bones[i] = None
                     break
+        self.RefreshSkeleton()
+        if len(self._bones) == 0:
+            self._root = None
 
-        self.Refresh()
+    def DeleteMVector(self, mVector):
+        for i in range(len(self._skin)):
+            if mVector == self._skin[i]:
+                self._skin[i] = None
+                break
+        self.RefreshSkinning()
 
     def GetBoneChildren(self, bone) -> list:
         if bone != None and len(bone._children) != 0:
@@ -90,9 +106,21 @@ class Skeleton:
             return children
         return []
 
-    def Refresh(self):
+    def RefreshSkeleton(self):
         cBones = []
         for _bone in self._bones:
             if _bone != None:
                 cBones.append(_bone)
         self._bones = cBones
+
+    def RefreshSkinning(self):
+        cSkin = list(self._skin)
+        self._skinPoints = []
+        self._skin = []
+        for _m_vect in cSkin:
+            if _m_vect != None:
+                self._skin.append(_m_vect)
+                self._skinPoints.append(_m_vect._pVector)
+
+    def CallReCalculateMVector(self, mVector):
+        mVector.ReCalculate(self._bones)

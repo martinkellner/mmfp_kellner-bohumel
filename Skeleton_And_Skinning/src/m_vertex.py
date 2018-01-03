@@ -9,9 +9,10 @@ class M_Vertex:
         self._weights = []
         self._infBones = []
         self._maxDist = 30.0;
+        self._selected = False
 
     def Draw(self, screen):
-        pygame.draw.circle(screen, pygame.Color('purple'),[int(self._pVector[0]), int(self._pVector[1])], 3, 0)
+        pygame.draw.circle(screen, pygame.Color('purple'),[int(self._pVector[0]), int(self._pVector[1])], 5 if self._selected else 3, 0)
 
     def Tranformation(self):
         np_PVector = np.array([0.0, 0.0, 0.0])
@@ -82,3 +83,9 @@ class M_Vertex:
     def ReCalculate(self, bones):
         self.calInfBoneAndWeights(bones)
         self.Tranformation()
+
+    def OnHover(self, x, y):
+        return math.sqrt((x-self._pVector[0])**2 + (y-self._pVector[1])**2) < 5
+
+    def Drag(self, nwPvector):
+        self._pVector = nwPvector

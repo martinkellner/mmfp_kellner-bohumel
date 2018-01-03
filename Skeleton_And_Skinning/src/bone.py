@@ -27,7 +27,6 @@ class Bone:
         self._selected = False
 
         self._endPointCircle = None
-        self._shadow = None
 
         if self._parent != None:
             self._parent.AddChild(self)
