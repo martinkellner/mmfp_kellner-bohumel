@@ -1,8 +1,9 @@
 import pygame
 import math
+import json
 
-from m_vertex import M_Vertex
-from bone import Bone
+from src.skeleton.m_vertex import M_Vertex
+from src.skeleton.bone import Bone
 
 class Skeleton:
 
@@ -13,6 +14,8 @@ class Skeleton:
         self.OnlyDrawBone = None
         self._skin = []
         self._skinPoints = []
+        self._next_bone_id = 0
+        self._screen = None
 
     def OnHoverBone(self, X, Y):
         for bone in self._bones:
@@ -44,10 +47,12 @@ class Skeleton:
         radian = math.atan2(yDelta, xDelta)
         if bone == None:
             if self._root == None:
-                self._bones.append(Bone(screen, cLength, radian, sVector, None))
+                self._bones.append(Bone(self._next_bone_id ,screen, cLength, radian, sVector, None))
                 self._root = self._bones[-1]
+                self._next_bone_id += 1
         else:
-            self._bones.append(Bone(screen, cLength, radian, None, bone))
+            self._bones.append(Bone(self._next_bone_id ,screen, cLength, radian, None, bone))
+            self._next_bone_id += 1
 
     def DrawOnly(self, screen, sVector, eVector, bone = None):
         cLength = math.sqrt((sVector[0] - eVector[0]) ** 2 + (sVector[1] - eVector[1]) ** 2)
@@ -55,9 +60,10 @@ class Skeleton:
         yDelta = eVector[1] - sVector[1]
         radian = math.atan2(yDelta, xDelta)
         if bone == None:
-            b = Bone(screen, cLength, radian, sVector)
+            b = Bone(None ,screen, cLength, radian, sVector)
         else:
-            b = Bone(screen, cLength, radian, parent=bone)
+            b = Bone(None, screen, cLength, radian, parent=bone)
+
         self.OnlyDrawBone = b
 
     def DrawMesh(self, screen):
@@ -124,3 +130,56 @@ class Skeleton:
 
     def CallReCalculateMVector(self, mVector):
         mVector.ReCalculate(self._bones)
+
+
+    def DoSaveData(self, f):
+        print(json.dumps(self, default=dict, sort_keys=True, indent=4), file=f)
+        f.close()
+
+    def __iter__(self):
+        seq = ['bones', 'root', 'skin', 'next_bone_id']
+        val = [self._bones, self._root, self._skin, self._next_bone_id]
+
+        for i in range(len(seq)):
+            yield (seq[i], val[i])
+
+    def DoLoadFile(self, f):
+        try:
+            jsonSkeleton = json.load(f)
+            new_bones = []
+            h_b = dict()
+            if 'bones' in jsonSkeleton:
+                bones = jsonSkeleton['bones']
+                root = None
+                for bone in bones:
+                    b = None
+                    if 'parent_id' in bone:
+                        b = Bone(int(bone['id']), self._screen, float(bone['length']), float(bone['angle']), None, h_b[bone['parent_id']])
+                    else:
+                        b = Bone(int(bone['id']), self._screen, float(bone['length']), float(bone['angle']), [float(bone['x']), float(bone['y'])], None)
+                        root = b
+
+                    h_b[str(b._id)] =  b
+                    new_bones.append(b)
+
+            new_skin = []
+            if 'skin' in jsonSkeleton:
+                skin = jsonSkeleton['skin']
+                for vector in skin:
+                    p_vector = [float(vector['x']), float(vector['y'])]
+                    inf_bones = [h_b[str(i)] for i in vector['inf_bones']]
+                    weights = [float(i) for i in vector['weights']]
+                    m_vertex = M_Vertex(p_vector)
+                    m_vertex._weights = weights
+                    m_vertex._infBones = inf_bones
+                    new_skin.append(m_vertex)
+
+            new_next_numner = int(jsonSkeleton['next_bone_id'])
+            self._skin = new_skin
+            self._bones = new_bones
+            self._next_bone_id = new_next_numner
+
+            self.RefreshSkinning()
+            self.Redraw()
+        except:
+            raise 'Chyba pri nacitani suboru!'

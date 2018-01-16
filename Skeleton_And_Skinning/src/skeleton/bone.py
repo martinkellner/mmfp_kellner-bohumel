@@ -1,14 +1,16 @@
 import pygame
 from math import cos, sin, atan2, sqrt
 
+import json
 
 import numpy as np
 from pygame import Color
 
 class Bone:
 
-    def __init__(self, screen, length, angle, sVector=None, parent=None):
+    def __init__(self, id, screen, length, angle, sVector=None, parent=None):
 
+        self._id = id
         self._sVector = parent._eVector if parent != None else sVector
         self._eVector = [None, None, 1]
         self._angle = angle
@@ -36,9 +38,6 @@ class Bone:
 
     def __str__(self):
         return '[( ' + str(self._sVector[0]) + ', ' + str(self._sVector[1]) + '),( ' + str(self._eVector[0]) + ', ' + str(self._eVector[1]) + ')]'
-
-    def __repr__(self):
-        print(str(self._sVector[0]) + ' ' + str(self._sVector[1]) + '\n' + str(self._eVector[0]) + ' ' + str(self._eVector[1]))
 
     def Draw(self):
         pygame.draw.line(self._screen, self._color, (self._sVector[0], self._sVector[1]),
@@ -111,3 +110,13 @@ class Bone:
         self.ReceiveWMatrix()
         if self._parent != None:
             self._wMatrix = np.dot(self._parent._wMatrix, self._wMatrix)
+
+    def __iter__(self):
+        seq = ['id','x', 'y', 'length', 'angle']
+        val = [self._id, self._sVector[0], self._sVector[1], self._lenght, self._angle]
+        if self._parent != None:
+            seq.append('parent_id')
+            val.append(self._parent._id)
+
+        for i in range(len(seq)):
+            yield (seq[i], '{}'.format(val[i]))

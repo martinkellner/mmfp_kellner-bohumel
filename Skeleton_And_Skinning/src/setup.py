@@ -13,7 +13,7 @@ if sys.platform == "win32":
 build_options = {"packages" : ["numpy", "wx", "pygame"],
                  "include_files" : ["edit.png", "move.png", "mesh.png"]}
 
-executables = [Executable("init.py", base=base)]
+executables = [Executable("__init__.py", base=base)]
 
 setup(name = "SkinAndBone",
       version = "0.1",

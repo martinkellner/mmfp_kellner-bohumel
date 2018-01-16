@@ -8,7 +8,7 @@ class M_Vertex:
         self._pVector = pVector
         self._weights = []
         self._infBones = []
-        self._maxDist = 30.0;
+        self._maxDist = 30.0
         self._selected = False
 
     def Draw(self, screen):
@@ -89,3 +89,10 @@ class M_Vertex:
 
     def Drag(self, nwPvector):
         self._pVector = nwPvector
+
+    def __iter__(self):
+        seq = ['x', 'y', 'inf_bones', 'weights']
+        val = [self._pVector[0], self._pVector[1]] + [[ b._id for b in self._infBones ]] + [[ w for w in self._weights ]]
+
+        for i in range(4):
+            yield (seq[i], val[i])

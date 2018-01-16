@@ -1,9 +1,7 @@
 import os
-
 import wx
 
-from sdlthread import SDLThread
-
+from src.gui.sdlthread import *
 
 class SDLPanel(wx.Panel):
 

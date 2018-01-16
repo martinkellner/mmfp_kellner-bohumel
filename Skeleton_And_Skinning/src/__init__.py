@@ -1,7 +1,7 @@
 import wx
 
-from myframe import MyFrame
-from skeleton import Skeleton
+from src.gui.myframe import MyFrame
+from src.skeleton.skeleton import Skeleton
 
 if __name__ == '__main__':
     app = wx.PySimpleApp()

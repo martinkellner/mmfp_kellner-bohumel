@@ -1,7 +1,7 @@
 import _thread as thread
 import pygame as pyGame
 from pygame import Color
-from skeleton import Skeleton
+from src.skeleton.skeleton import *
 
 sVector = None
 eVector = None
@@ -25,6 +25,7 @@ class SDLThread(object):
         self.bone = None
         self.boneHover = None
         self.skeleton = Skeleton()
+        self.skeleton._screen = self.screen
 
     def Start(self):
         self.m_bKeepGoing = self.m_bRunning = True
@@ -122,9 +123,6 @@ class SDLThread(object):
             boneSelected = bone
             boneSelected._selected = True
 
-
-
-
     def MovingLMouseDown(self):
         global dragBone
         if dragBone != None:
@@ -194,3 +192,6 @@ class SDLThread(object):
         if mVectorSelected != None:
             self.skeleton.DeleteMVector(mVectorSelected)
             mVectorSelected = None
+
+    def Instance_Skeleton(self):
+        return self.skeleton
