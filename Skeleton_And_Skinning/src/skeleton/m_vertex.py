@@ -22,31 +22,34 @@ class M_Vertex:
         self._pVector[0] = round(np_PVector[0], 4)
         self._pVector[1] = round(np_PVector[1], 4)
 
-    def calInfBoneAndWeights(self, bones):
+    def CallInfBoneAndWeights(self, bones):
         distBones = []
         self._weights = []
         self._infBones = []
         for _bone in bones:
             bDistance = self.DistancePointLine(self._pVector[0], self._pVector[1], _bone._sVector[0],_bone._sVector[1], _bone._eVector[0], _bone._eVector[1])
-            if self._maxDist < bDistance:
-                continue
             distBones.append(bDistance)
             self._infBones.append(_bone)
 
-        if len(distBones) == 0:
-            self._infBones = []
-            return
-        elif len(distBones) == 1:
-            self._weights.append(1)
-            return
-        print(distBones)
-        print(sum(distBones))
-        sDist = sum(distBones)
+        #filtering bones with low influece on skin vector
+        c_infBones = []
+        c_distBones = []
+        min_distance = min(distBones)
+        for i in range(len(distBones)):
+            if (min_distance * 1.1) > distBones[i]:
+                c_distBones.append(distBones[i])
+                c_infBones.append(self._infBones[i])
+        self._infBones = c_infBones
+        distBones = c_distBones
+        sum_distance = sum(distBones)
         for i in distBones:
-            self._weights.append((sDist-i)/sDist)
-        sWeigth = sum(self._weights)
-        self._weights = list(map(lambda x: x/sWeigth, self._weights))
-        print(self._weights)
+            self._weights.append((sum_distance-i)/sum_distance)
+        if len(self._weights) == 1:
+            self._weights = [1]
+        else:
+            sum_weights = sum(self._weights)
+            self._weights = list(map(lambda x: x/sum_weights, self._weights))
+
 
     def lineMagnitude(self, x1, y1, x2, y2):
         lineMagnitude = math.sqrt(math.pow((x2 - x1), 2) + math.pow((y2 - y1), 2))
@@ -81,7 +84,7 @@ class M_Vertex:
         return DistancePointLine
 
     def ReCalculate(self, bones):
-        self.calInfBoneAndWeights(bones)
+        self.CallInfBoneAndWeights(bones)
         self.Tranformation()
 
     def OnHover(self, x, y):

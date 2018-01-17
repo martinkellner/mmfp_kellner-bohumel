@@ -74,7 +74,7 @@ class Skeleton:
 
     def AddM_Vertex(self, pVertex):
         n_M_Vertex = M_Vertex(pVertex)
-        n_M_Vertex.calInfBoneAndWeights(self._bones)
+        n_M_Vertex.CallInfBoneAndWeights(self._bones)
         self._skin.append(n_M_Vertex)
         self._skinPoints.append(n_M_Vertex._pVector)
 
