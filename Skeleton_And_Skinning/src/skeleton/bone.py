@@ -1,64 +1,78 @@
 import pygame
-from math import cos, sin, atan2, sqrt
-
-import json
-
 import numpy as np
+
+from math import cos, sin, atan2, sqrt
 from pygame import Color
 
+''' Trieda reprezentujucu kost '''
 class Bone:
 
+    # Konstruktor
     def __init__(self, id, screen, length, angle, sVector=None, parent=None):
-
-        self._id = id
+        self._id = id # ID kost
+        # Vektor prveho bodu, bud od otca alebo ak je root, tak svoj
         self._sVector = parent._eVector if parent != None else sVector
+        # Pole pre koncovy vektor, bude vypocitany
         self._eVector = [None, None, 1]
-        self._angle = angle
+        self._angle = angle # Uhol
+        # Uhol medzi kostou a otcovskou kostou
         self._sAngle = self._angle - parent._angle if parent != None else self._angle
-        self._dAngle = 0.0
-        self._lenght = length
-        self._parent = parent
-        self._children = []
-        self._countChildren = 0
+        self._dAngle = 0.0  # Pomocna premenna
+        self._lenght = length # Dlzka
+        self._parent = parent # otec kosti
+        self._children = []   # deti kosti
 
+        # Vypocitaj koncovy vektor
         self.CalculateEVector()
-
+        # Graficka plocha kniznice pyGame
         self._screen = screen
+        # Farba kosti
         self._color = Color('red') if parent == None else Color('black')
-        self._shColor = Color(0, 208, 119, 32)
-        self._selected = False
+        self._selected = False # Premenna hovori, ci je kost vybrana
 
-        self._endPointCircle = None
-
+        self._endPointCircle = None # Zviditelne koncove body, zviditelnenie ci je kost vybrana, alebo sa na nu ukazuje
+        # Ak ma kost otca, tak otcovi pridaj tuto kost ako dieta
         if self._parent != None:
             self._parent.AddChild(self)
 
+        # World Matrix kosti
         self._wMatrix = None
+        # Ziskaj maticu sveta kosti
         self.ReceiveWMatrix()
 
+    # Textova reprezentacia objektu
     def __str__(self):
         return '[( ' + str(self._sVector[0]) + ', ' + str(self._sVector[1]) + '),( ' + str(self._eVector[0]) + ', ' + str(self._eVector[1]) + ')]'
 
+    # Vykresli kost
     def Draw(self):
+        # Kresli ciaru
         pygame.draw.line(self._screen, self._color, (self._sVector[0], self._sVector[1]),
                          (self._eVector[0], self._eVector[1]), 2 if self._endPointCircle == None else 3)
+        # Kresli koncove body, ak je kost vybrana
         if self._endPointCircle != None:
-               self.DrawEndPoints()
+            self.DrawEndPoints()
 
+    # Kresli koncove body
     def DrawEndPoints(self):
         self._endPointCircle = pygame.draw.circle(self._screen, self._color, (int(self._eVector[0]), int(self._eVector[1])), 6, 2 if self._selected else 0 )
 
+    # Zmaz koncove body
     def RemoveEndPoints(self):
         self._endPointCircle = None
 
+    # Vrati kost True, ak na kost je ukazovane mysou
     def IsOnHover(self, x, y):
+        # True, ak ukazujes v blizkosti koncoveho vektora
         test0 = ((x - self._eVector[0])**2 + (y - self._eVector[1])**2) <= 3.5**2
         if test0:
             return True
         else:
+            # Test ci je na vzdialeny bod mysi od priamku urcenej dvoma vektromi (start, end) kosti viac ako 3 ak ano tak False
             test1 = abs((self._eVector[1] - self._sVector[1])*x - (self._eVector[0] - self._sVector[0])*y + self._eVector[0]*self._sVector[1] - self._eVector[1]*self._sVector[0])/sqrt((self._eVector[1] - self._sVector[1])**2 + (self._eVector[0] - self._sVector[0])**2)
             if not (test1 < 3):
                 return False
+            #Test ci lezi bod kliknutia vo stvoruholniku minx - 3 - maxx + 3; miny - 3 maxy +3
             minX = min(self._sVector[0], self._eVector[0])
             minY = min(self._sVector[1], self._eVector[1])
             test2 = (minX - 3 < x < (self._sVector[0] if minX == self._eVector[0] else self._eVector[0]) + 3) and (minY - 3 < y < (self._sVector[1] if minY == self._eVector[1] else self._eVector[1]) + 3)
@@ -66,10 +80,11 @@ class Bone:
                 return True
             return False
 
+    # Pridaj dieta kosti
     def AddChild(self, bone):
         self._children.append(bone)
-        self._countChildren += 1
 
+    # Vypoctaj koncovy vektor kosti na zaklada uhla a dlzky a prveho vektora
     def CalculateEVector(self):
         self._eVector[0] = self._sVector[0] + (self._lenght * cos(self._angle if self._parent == None else self._sAngle + self._parent._angle))
         self._eVector[1] = self._sVector[1] + (self._lenght * sin(self._angle if self._parent == None else self._sAngle + self._parent._angle))

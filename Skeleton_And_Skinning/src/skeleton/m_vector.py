@@ -2,7 +2,7 @@ import pygame
 import math
 import numpy as np
 ''' Trieda M_Vector, sluzi na reprezentaciu jedneho vektora skin-u. '''
-class M_Vertex:
+class M_Vector:
 
     '''Konstruktor'''
     def __init__(self, pVector):

@@ -127,7 +127,7 @@ class SDLThread(object):
         global dragBone
         if dragBone != None:
             dragBone = None
-            self.skeleton.RstWBnsWMatrix()
+            self.skeleton.RecalculateBoneWMatrix()
         elif bone != None:
             dragBone = bone
             self.skeleton.OnlyDrawBone = None
@@ -158,7 +158,7 @@ class SDLThread(object):
         global mVectorSelected
         if mVectorSelected != None:
             mVectorSelected._selected = False
-            self.skeleton.CallReCalculateMVector(mVectorSelected)
+            self.skeleton.RecalculateMVectorWeights(mVectorSelected)
             self.skeleton.RefreshSkinning()
             mVectorSelected = None
         else:
@@ -181,7 +181,7 @@ class SDLThread(object):
         global mVectorHovered, mVectorSelected
         if mVectorSelected != None:
             mVectorSelected._selected = False
-            self.skeleton.CallReCalculateMVector(mVectorSelected)
+            self.skeleton.RecalculateMVectorWeights(mVectorSelected)
             self.skeleton.RefreshSkinning()
             mVectorSelected = None
         elif mVectorHovered != None:
