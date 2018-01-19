@@ -104,9 +104,9 @@ class SDLThread(object):
             dragBone.Move([e.pos[0], e.pos[1]])
             self.skeleton.TranformSkin()
             dragBone._dAngle = 0
-            dragBone.ReCalwMatrix()
+            dragBone.RecalculateWorldMatrix()
             for _ch in dragBone._children:
-                _ch.ReCalwMatrix()
+                _ch.RecalculateWorldMatrix()
         else:
             bone = self.skeleton.OnHoverBone(e.pos[0], e.pos[1])
 

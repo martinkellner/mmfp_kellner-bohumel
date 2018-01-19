@@ -100,7 +100,7 @@ class Skeleton:
     # Prepocitanie world matrix pre kost
     def RecalculateBoneWMatrix(self):
         for bone in self._bones:
-            bone.ReCalwMatrix()
+            bone.RecalculateWorldMatrix()
 
     # Vymazanie kosti, pri mazani kosti sa mazu aj vsetky jeho deti
     def DeleteBone(self, bone):
