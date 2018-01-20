@@ -1,5 +1,4 @@
-
-
+# BUILD script pre vytvorenie .exe suboru z python scriptov pomocou kniznice cx_Freeze
 import sys, os
 from cx_Freeze import setup, Executable
 

@@ -1,7 +1,7 @@
 import pygame
 import math
 import numpy as np
-''' Trieda M_Vector, sluzi na reprezentaciu jedneho vektora skin-u. '''
+# Trieda M_Vector, sluzi na reprezentaciu jedneho vektora skin-u
 class M_Vector:
 
     '''Konstruktor'''
@@ -12,17 +12,16 @@ class M_Vector:
         self._selected = False  # pomocna premenna pri manipulacii s vektrom
         self._filter_constant = 1.3 # konstanta pre fitrovanie vah a kosti
 
-    '''Vykreslenie objektu do grafickej plochy'''
+    # Vykreslenie objektu do grafickej plochy
     def Draw(self, screen):
         pygame.draw.circle(screen, pygame.Color('purple'),[int(self._pVector[0]), int(self._pVector[1])], 5 if self._selected else 3, 0)
 
-    ''' Pohyb zmena pozicie na zaklade novej pozicie kosti, ktore maju
-        vplyv na pohyb vektora.'''
+    # Pohyb zmena pozicie na zaklade novej pozicie kosti, ktore maju
+    # vplyv na pohyb vektora.'''
     def Tranformation(self):
         # Inicializacia vektora
         np_PVector = np.array([0.0, 0.0, 0.0])
         old_PVector = self._pVector + [1]
-
         # Prechadzaj vsetky vplyvne kosti
         for i in range(len(self._infBones)):
             # Nasobenie matice (world matrix danej kosti) vplyvnej kosti s vektorom sucastnej pozicie -> vysledok prevahovani na zaklade vplyvu
@@ -33,12 +32,11 @@ class M_Vector:
         self._pVector[0] = np_PVector[0]
         self._pVector[1] = np_PVector[1]
 
-    ''' Predzaj vsetky kosti, vypocital vzdialenost od kosti a na zaklade vzdialenosti prirad vahy '''
+    # Predzaj vsetky kosti, vypocital vzdialenost od kosti a na zaklade vzdialenosti prirad vahy
     def Calculate_Weights(self, bones):
         distances_from_bones = []
         new_inf_bones = []
         weights_of_bones = []
-
         # Vypocitaj vzdialenosti od vsetkych danych kosti
         for _bone in bones:
             distance_bone = self.DistancePointLine(self._pVector[0], self._pVector[1], _bone._sVector[0],_bone._sVector[1], _bone._eVector[0], _bone._eVector[1])
@@ -78,18 +76,16 @@ class M_Vector:
             self._weights = [weigh/sum_inv_weight for weigh in weights_of_bones]
 
         self._infBones = new_inf_bones
-        print(self._weights)
 
-    ''' 1/2 Funkcia pre vypocet vzdialenosti bodu od priamky
-        prevzate z http://local.wasp.uwa.edu.au/~pbourke/geometry/pointline/source.vba
-    '''
+    # 1/2 Funkcia pre vypocet vzdialenosti bodu od priamky
+    # prevzate z http://local.wasp.uwa.edu.au/~pbourke/geometry/pointline/source.vba
+
     def lineMagnitude(self, x1, y1, x2, y2):
         lineMagnitude = math.sqrt(math.pow((x2 - x1), 2) + math.pow((y2 - y1), 2))
         return lineMagnitude
 
-    ''' 2/2 Funkcia pre vypocet vzdialenosti bodu od priamky
-        prevzate z http://local.wasp.uwa.edu.au/~pbourke/geometry/pointline/source.vba
-    '''
+    # 2/2 Funkcia pre vypocet vzdialenosti bodu od priamky
+    # prevzate z http://local.wasp.uwa.edu.au/~pbourke/geometry/pointline/source.vba
     def DistancePointLine(self, px, py, x1, y1, x2, y2):
         # http://local.wasp.uwa.edu.au/~pbourke/geometry/pointline/source.vba
         LineMag = self.lineMagnitude(x1, y1, x2, y2)

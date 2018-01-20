@@ -114,6 +114,9 @@ class Bone:
             _ch.MoveChilder()                      # Pohni jeho detmi
             _ch._dAngle = 0.0
 
+    # Matica kosti, vynasobena matice transfomacna do suradnicovej sustavy kosti, rotacia, trasformacie naspat do
+    # globalnej sustany suradnic - Matica sveta pre kost, na zaklade tejto matice sa vyhu vektory skinningu, na ktore
+    # ma dana kost vplyv
     def ReceiveWMatrix(self):
         sinA = sin(self._dAngle)
         cosA = cos(self._dAngle)
