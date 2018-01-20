@@ -135,6 +135,10 @@ class PyGame_Surface():
         elif self.bone != None:
             self.boneSelected = self.bone
             self.boneSelected._selected = True
+        elif self.skeleton._root == None and self.skeleton.OnlyDrawBone != None:
+            self.skeleton.OnlyDrawBone = None
+            self.sVector = None
+
 
     # Akcie pri stlaceni laveho tlacidla mysi, ked je zapnuty pohyb kosti
     def LeftBMouseMoving(self):
@@ -159,6 +163,8 @@ class PyGame_Surface():
             self.bone._selected = False
             self.bone = None
         else:
+            if self.skeleton._root != None:
+                return
             if self.sVector == None:
                 self.sVector = (e.pos[0], e.pos[1], 1)
             elif self.eVector == None:

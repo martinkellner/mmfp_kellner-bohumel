@@ -2,6 +2,7 @@ import pygame
 import numpy as np
 
 from math import cos, sin, atan2, sqrt
+import numpy as pn
 from pygame import Color
 
 ''' Trieda reprezentujucu kost '''
@@ -91,10 +92,20 @@ class Bone:
 
     # Pohyb kosti
     def Move(self, eM_Vector):
-        xDelta = eM_Vector[0] - self._sVector[0] # Vektor prveho bodu, bud od otca alebo svoj
-        yDelta = eM_Vector[1] - self._sVector[1] # Vektor prveho bodu, bud od otca alebo svoj
 
-        _angle = atan2(yDelta, xDelta) # Uhol zmeny
+        # Pohyb smerom ku mysi, testy ci sa priblizim ku mysi ak pridam .02 alebo ak odpocimal .02 od povodneho uhlu
+        test_1 = np.array([self._sVector[0] + (self._lenght * cos(self._angle - .02 if self._parent == None else self._sAngle + self._parent._angle - .02)),
+            self._sVector[1] + (self._lenght * sin(self._angle - .02 if self._parent == None else self._sAngle + self._parent._angle - .02))])
+
+        test_2 = ([self._sVector[0] + (self._lenght * cos(self._angle + .02 if self._parent == None else self._sAngle + self._parent._angle + .02)),
+                    self._sVector[1] + (self._lenght * sin(self._angle + .02 if self._parent == None else self._sAngle + self._parent._angle +  .02))])
+
+        _angle = None
+        if (np.linalg.norm(np.array(eM_Vector) - test_1) >= np.linalg.norm(np.array(eM_Vector) - test_2)):
+            _angle = self._angle + .02
+        else:
+            _angle = self._angle - .02
+
         self._dAngle = self._sAngle = _angle - self._angle # Pomocne premenne nadobudaju hodnotu rozdielu
         self.RecalculateWorldMatrix() # Prepocita sa nova matica pre kost
         self._angle = _angle # Novy uhol
