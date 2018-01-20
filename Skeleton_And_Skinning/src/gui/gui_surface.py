@@ -1,8 +1,11 @@
-import wx
 import os
-from src.gui.sdlthread import SDLThread
+import wx
 
-class SDLPanel(wx.Panel):
+from src.gui.pyGame_Surface import *
+
+# Medzi clanok pre spolupracu grafickej kniznice pyGame a wx.
+# Do panelu wx je pridana plocha pyGame kniznice
+class Gui_Surface(wx.Panel):
 
     def __init__(self, parent, ID, game_size):
         wx.Panel.__init__(self, parent, ID, size=game_size)
@@ -13,6 +16,5 @@ class SDLPanel(wx.Panel):
         pygame = pygame
         pygame.display.init()
         window = pygame.display.set_mode(game_size)
-        self.thread = SDLThread(parent, window)
-        self.thread.Start()
-
+        self.pygame_surface_gui = PyGame_Surface(parent, window)
+        self.pygame_surface_gui.Start()

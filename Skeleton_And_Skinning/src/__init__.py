@@ -1,11 +1,12 @@
-import pygame
 import wx
-from src.gui.myframe import MyFrame
-from src.skeleton import Skeleton
 
+from src.gui.gui_Parent import Gui_Parent
+from src.skeleton.skeleton import Skeleton
+
+# Spustenie aplikacie, volanie inicializacie grafickeho rozhrania
 if __name__ == '__main__':
     app = wx.PySimpleApp()
-    frame = MyFrame(None, -1, "Danger Island", (1024, 576))
+    frame = Gui_Parent(None, -1, "Skin and Bone", wx.DisplaySize())
     frame.Show()
     app.MainLoop()
 
